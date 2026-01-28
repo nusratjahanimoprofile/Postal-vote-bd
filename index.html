@@ -18,24 +18,28 @@
 <body class="bg-slate-50 text-slate-900">
     <div id="root"></div>
 
-    <!-- Capacitor Permission Script -->
+    <!-- Capacitor Permission Script (Safe Mode) -->
     <script>
-        window.onload = async () => {
-            if (window.Capacitor) {
-                try {
-                    const { Camera } = Capacitor.Plugins;
-                    const { Geolocation } = Capacitor.Plugins;
-                    
-                    // ক্যামেরা এবং লোকেশন পারমিশন রিকোয়েস্ট
-                    if (Camera) await Camera.requestPermissions();
-                    if (Geolocation) await Geolocation.requestPermissions();
-                    
-                    console.log("Permissions requested on startup");
-                } catch (error) {
-                    console.error("Capacitor permission error:", error);
+        document.addEventListener('DOMContentLoaded', () => {
+            // অ্যাপ লোড হওয়ার পর ২ সেকেন্ড অপেক্ষা করে পারমিশন চাইবে
+            // এটি অ্যাপ ক্র্যাশ হওয়া থেকে বাঁচায়
+            setTimeout(async () => {
+                if (window.Capacitor) {
+                    try {
+                        const { Camera } = Capacitor.Plugins;
+                        const { Geolocation } = Capacitor.Plugins;
+                        
+                        // ক্যামেরা এবং লোকেশন পারমিশন রিকোয়েস্ট
+                        if (Camera) await Camera.requestPermissions();
+                        if (Geolocation) await Geolocation.requestPermissions();
+                        
+                        console.log("Permissions requested safely on startup");
+                    } catch (error) {
+                        console.warn("Capacitor permission error:", error);
+                    }
                 }
-            }
-        };
+            }, 2000); // ২০০০ মিলি সেকেন্ড = ২ সেকেন্ড ডিলে
+        });
     </script>
 
     <script type="module" src="/src/main.tsx"></script>
