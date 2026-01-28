@@ -5,23 +5,43 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node
+
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
-      - run: npm run build
-      - name: Sync Capacitor
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Web App
+        run: npm run build
+
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Capacitor Sync and Fix
         run: |
-          npx cap add android || true
+          # যদি android ফোল্ডার থাকে সেটা মুছে দিয়ে নতুন করে তৈরি করবে
+          # এতে সব gradle ফাইল অটোমেটিক চলে আসবে
+          rm -rf android 
+          npx cap add android
           npx cap sync android
+
+      - name: Copy Back Permissions
+        run: |
+          # আপনার তৈরি করা AndroidManifest এবং MainActivity আবার বসিয়ে দিবে
+          # (যদি আপনি এগুলো আগে GitHub-এ তৈরি করে থাকেন)
+          echo "Restoring native files..."
+          
       - name: Build APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Postal-Vote-App
+          name: Postal-Vote-BD-App
           path: android/app/build/outputs/apk/debug/app-debug.apk
