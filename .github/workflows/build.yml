@@ -25,20 +25,21 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # ৪. ডিপেন্ডেন্সি ইন্সটল এবং ওয়েব বিল্ড
+      # ৪. ওয়েব বিল্ড তৈরি
       - name: Install Dependencies and Build Web
         run: |
           npm install
           npm run build
 
-      # ৫. অ্যান্ড্রয়েড প্ল্যাটফর্ম তৈরি করা (এটি gradlew ফাইল তৈরি করবে)
-      - name: Setup Android Platform
+      # ৫. Android ফোল্ডার রিসেট করা (পুরানো ফোল্ডার মুছে নতুন করে তৈরি)
+      # এটি 'already exists' এবং 'missing gradlew' দুটি সমস্যারই সমাধান করবে
+      - name: Setup Fresh Android Platform
         run: |
           npm install @capacitor/android
+          rm -rf android
           npx cap add android
 
       # ৬. আপনার কাস্টম পারমিশন ও ফাইল ফিক্স (Native Fixes)
-      # এটি 'add android' এর পরে হতে হবে, যাতে ফাইলগুলো রিপ্লেস করা যায়
       - name: Copy Back Permissions
         run: |
           cp native-fixes/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
@@ -46,7 +47,7 @@ jobs:
           cp native-fixes/MainActivity.java android/app/src/main/java/com/postalvote/app/MainActivity.java
           echo "✅ Native files restored!"
 
-      # ৭. Capacitor সিঙ্ক করা
+      # ৭. Capacitor সিঙ্ক করা (ওয়েব বিল্ড অ্যান্ড্রয়েডে পাঠানো)
       - name: Sync Capacitor
         run: npx cap sync android
 
