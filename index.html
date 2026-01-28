@@ -17,6 +17,27 @@
 </head>
 <body class="bg-slate-50 text-slate-900">
     <div id="root"></div>
+
+    <!-- Capacitor Permission Script -->
+    <script>
+        window.onload = async () => {
+            if (window.Capacitor) {
+                try {
+                    const { Camera } = Capacitor.Plugins;
+                    const { Geolocation } = Capacitor.Plugins;
+                    
+                    // ক্যামেরা এবং লোকেশন পারমিশন রিকোয়েস্ট
+                    if (Camera) await Camera.requestPermissions();
+                    if (Geolocation) await Geolocation.requestPermissions();
+                    
+                    console.log("Permissions requested on startup");
+                } catch (error) {
+                    console.error("Capacitor permission error:", error);
+                }
+            }
+        };
+    </script>
+
     <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>
