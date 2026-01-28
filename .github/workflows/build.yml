@@ -1,6 +1,32 @@
-[
-  {
-    "message": "নিচে সঠিক নিয়মে (Correct Indentation) কোডটি দেওয়া হলো। 'name' এবং 'run' একই বরাবর (alignment) রাখা হয়েছে। এটি কপি করে ব্যবহার করুন।",
-    "yaml_code": "- name: Copy Back Permissions\n  run: |\n    # ১. AndroidManifest কপি করা\n    cp native-fixes/AndroidManifest.xml android/app/src/main/AndroidManifest.xml\n    \n    # ২. MainActivity কপি করার জন্য সঠিক ফোল্ডার তৈরি\n    mkdir -p android/app/src/main/java/com/postalvote/app/\n    cp native-fixes/MainActivity.java android/app/src/main/java/com/postalvote/app/MainActivity.java\n    \n    echo \"✅ Native files restored with correct package path!\""
-  }
-]
+name: Build Android
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # আপনার কাঙ্খিত অংশটি এখানে বসবে (steps এর নিচে)
+      - name: Copy Back Permissions
+        run: |
+          # ১. AndroidManifest কপি করা
+          cp native-fixes/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
+          
+          # ২. MainActivity কপি করার জন্য সঠিক ফোল্ডার তৈরি
+          mkdir -p android/app/src/main/java/com/postalvote/app/
+          cp native-fixes/MainActivity.java android/app/src/main/java/com/postalvote/app/MainActivity.java
+          
+          echo "✅ Native files restored with correct package path!"
+
+      # এরপর বাকি কমান্ডগুলো (যেমন build command)
