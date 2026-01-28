@@ -1,54 +1,11 @@
-name: Build Android APK
-
-on: [push]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Build Web App
-        run: npm run build
-
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Capacitor Sync and Fix
+- name: Copy Back Permissions
         run: |
-          # ডিফল্ট অ্যান্ড্রয়েড ফোল্ডার তৈরি
-          rm -rf android 
-          npx cap add android
-          npx cap sync android
-
-      - name: Copy Back Permissions
-        run: |
-          # আপনার তৈরি করা native-fixes ফোল্ডার থেকে ফাইলটি কপি করা
-          if [ -f "native-fixes/AndroidManifest.xml" ]; then
-            cp native-fixes/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
-            echo "✅ Custom AndroidManifest applied successfully!"
-          else
-            echo "❌ Error: native-fixes/AndroidManifest.xml not found!"
-            exit 1
-          fi
-
-      - name: Build APK
-        run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Postal-Vote-BD-App
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          # ১. AndroidManifest কপি করা
+          cp native-fixes/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
+          
+          # ২. সঠিক ফোল্ডার তৈরি এবং MainActivity কপি করা
+          # আপনার প্যাকেজ নাম অনুযায়ী পাথ তৈরি করা হচ্ছে
+          mkdir -p android/app/src/main/java/com/postalvote/app/
+          cp native-fixes/MainActivity.java android/app/src/main/java/com/postalvote/app/MainActivity.java
+          
+          echo "✅ Native files restored successfully!"
