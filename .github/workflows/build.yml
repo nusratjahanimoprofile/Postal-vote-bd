@@ -1,5 +1,5 @@
 - name: Copy Back Permissions
-        run: |
+run: |
           # ১. AndroidManifest কপি করা
           cp native-fixes/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
           
