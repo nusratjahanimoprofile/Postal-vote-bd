@@ -1,0 +1,6 @@
+{
+  "appId": "com.postalvote.app",
+  "appName": "Postal Vote BD",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
