@@ -9,15 +9,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ১. কোড চেকআউট করা
       - uses: actions/checkout@v3
 
+      # ২. Node.js সেটআপ (React/Web অংশের জন্য)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # ৩. ডিপেন্ডেন্সি ইন্সটল এবং ওয়েব বিল্ড
+      - name: Install Dependencies and Build Web
+        run: |
+          npm install
+          npm run build
+
+      # ৪. JDK সেটআপ (Android এর জন্য)
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # আপনার কাঙ্খিত অংশটি এখানে বসবে (steps এর নিচে)
+      # ৫. আপনার কাস্টম পারমিশন ও ফাইল ফিক্স (Native Fixes)
       - name: Copy Back Permissions
         run: |
           # ১. AndroidManifest কপি করা
@@ -29,4 +43,20 @@ jobs:
           
           echo "✅ Native files restored with correct package path!"
 
-      # এরপর বাকি কমান্ডগুলো (যেমন build command)
+      # ৬. Capacitor সিঙ্ক করা (Web কোড Android এ পাঠানো)
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      # ৭. Android APK বিল্ড করা
+      - name: Build Android APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      # ৮. APK আপলোড করা (যাতে আপনি ডাউনলোড করতে পারেন)
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
