@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postal Vote BD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'Hind Siliguri', sans-serif; }
+        .bg-bd-green { background-color: #006a4e; }
+        .text-bd-green { color: #006a4e; }
+        .bg-bd-red { background-color: #f42a41; }
+        @keyframes scan { 0% { transform: translateY(0); opacity: 0; } 100% { transform: translateY(320px); opacity: 0; } }
+        .animate-scan { animation: scan 2s linear infinite; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>
