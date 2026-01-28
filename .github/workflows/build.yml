@@ -1,10 +1,13 @@
 name: Build Android APK
+
 on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -22,18 +25,22 @@ jobs:
 
       - name: Capacitor Sync and Fix
         run: |
-          # যদি android ফোল্ডার থাকে সেটা মুছে দিয়ে নতুন করে তৈরি করবে
-          # এতে সব gradle ফাইল অটোমেটিক চলে আসবে
+          # ডিফল্ট অ্যান্ড্রয়েড ফোল্ডার তৈরি
           rm -rf android 
           npx cap add android
           npx cap sync android
 
       - name: Copy Back Permissions
         run: |
-          # আপনার তৈরি করা AndroidManifest এবং MainActivity আবার বসিয়ে দিবে
-          # (যদি আপনি এগুলো আগে GitHub-এ তৈরি করে থাকেন)
-          echo "Restoring native files..."
-          
+          # আপনার তৈরি করা native-fixes ফোল্ডার থেকে ফাইলটি কপি করা
+          if [ -f "native-fixes/AndroidManifest.xml" ]; then
+            cp native-fixes/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
+            echo "✅ Custom AndroidManifest applied successfully!"
+          else
+            echo "❌ Error: native-fixes/AndroidManifest.xml not found!"
+            exit 1
+          fi
+
       - name: Build APK
         run: |
           cd android
