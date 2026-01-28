@@ -3,9 +3,9 @@
           # ১. AndroidManifest কপি করা
           cp native-fixes/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
           
-          # ২. সঠিক ফোল্ডার তৈরি এবং MainActivity কপি করা
-          # আপনার প্যাকেজ নাম অনুযায়ী পাথ তৈরি করা হচ্ছে
+          # ২. MainActivity কপি করার জন্য সঠিক ফোল্ডার তৈরি (প্যাকেজ অনুযায়ী)
+          # com.postalvote.app এর জন্য পাথ হবে: com/postalvote/app
           mkdir -p android/app/src/main/java/com/postalvote/app/
           cp native-fixes/MainActivity.java android/app/src/main/java/com/postalvote/app/MainActivity.java
           
-          echo "✅ Native files restored successfully!"
+          echo "✅ Native files restored with correct package path!"
