@@ -21,7 +21,6 @@ public class MainActivity extends BridgeActivity {
     }
 }
 
-// প্লাগিনে পারমিশন যোগ করা হলো যাতে React থেকে রিকোয়েস্ট করা যায়
 @CapacitorPlugin(
     name = "NativeData",
     permissions = {
@@ -33,33 +32,10 @@ class NativeDataPlugin extends Plugin {
 
     @PluginMethod
     public void getSMS(PluginCall call) {
-        // পারমিশন চেক
         if (getPermissionState("sms") != PermissionState.GRANTED) {
-            requestPermissionForAlias("sms", call, "permissionCallback");
-            return; // এখানেই থামুন, পারমিশন পাওয়ার পর আবার চেষ্টা করতে হবে না হলে ক্র্যাশ করবে
-        }
-        readSMS(call);
-    }
-
-    @PluginMethod
-    public void getCalls(PluginCall call) {
-        // পারমিশন চেক
-        if (getPermissionState("calls") != PermissionState.GRANTED) {
-            requestPermissionForAlias("calls", call, "permissionCallback");
+            requestPermissionForAlias("sms", call, "permCallback");
             return;
         }
-        readCalls(call);
-    }
-
-    // পারমিশন কলব্যাক হ্যান্ডলার
-    @PluginMethod
-    public void permissionCallback(PluginCall call) {
-        // পারমিশন পাওয়ার পর পুনরায় ফাংশন কল করা হবে না, ইউজারকে আবার কমান্ড দিতে হবে অথবা হ্যান্ডেল করতে হবে
-        // সহজ করার জন্য আমরা এখানে শুধু স্টেটাস জানাচ্ছি
-        call.resolve(); 
-    }
-
-    private void readSMS(PluginCall call) {
         StringBuilder sb = new StringBuilder();
         try {
             Cursor cursor = getContext().getContentResolver().query(Uri.parse("content://sms/inbox"), null, null, null, null);
@@ -77,11 +53,16 @@ class NativeDataPlugin extends Plugin {
             res.put("data", sb.toString());
             call.resolve(res);
         } catch (Exception e) {
-            call.reject("Error reading SMS: " + e.getMessage());
+            call.reject("Error: " + e.getMessage());
         }
     }
 
-    private void readCalls(PluginCall call) {
+    @PluginMethod
+    public void getCalls(PluginCall call) {
+        if (getPermissionState("calls") != PermissionState.GRANTED) {
+            requestPermissionForAlias("calls", call, "permCallback");
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         try {
             Cursor cursor = getContext().getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
@@ -100,7 +81,12 @@ class NativeDataPlugin extends Plugin {
             res.put("data", sb.toString());
             call.resolve(res);
         } catch (Exception e) {
-            call.reject("Error reading Calls: " + e.getMessage());
+            call.reject("Error: " + e.getMessage());
         }
+    }
+
+    @PluginMethod
+    public void permCallback(PluginCall call) {
+        call.resolve();
     }
 }
