@@ -12,6 +12,7 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.PermissionState; // এই লাইনটি মিসিং ছিল
 
 public class MainActivity extends BridgeActivity {
     @Override
@@ -87,6 +88,7 @@ class NativeDataPlugin extends Plugin {
 
     @PluginMethod
     public void permCallback(PluginCall call) {
+        // পারমিশন রেজাল্ট হ্যান্ডল করা হচ্ছে
         call.resolve();
     }
 }
