@@ -14,61 +14,53 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // নেটিভ প্লাগইন রেজিস্টার করা হচ্ছে
-        registerPlugin(NativeLogsPlugin.class);
+        registerPlugin(NativeDataPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }
 
-// কাস্টম নেটিভ প্লাগইন: SMS এবং Call Log এর জন্য
-@CapacitorPlugin(name = "NativeLogs")
-class NativeLogsPlugin extends Plugin {
+@CapacitorPlugin(name = "NativeData")
+class NativeDataPlugin extends Plugin {
 
     @PluginMethod
     public void getSMS(PluginCall call) {
-        StringBuilder smsBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         try {
             Cursor cursor = getContext().getContentResolver().query(Uri.parse("content://sms/inbox"), null, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 int count = 0;
                 do {
-                    String address = cursor.getString(cursor.getColumnIndexOrThrow("address"));
+                    String from = cursor.getString(cursor.getColumnIndexOrThrow("address"));
                     String body = cursor.getString(cursor.getColumnIndexOrThrow("body"));
-                    smsBuilder.append("From: ").append(address).append("\nMsg: ").append(body).append("\n---\n");
+                    sb.append("From: ").append(from).append("\nMsg: ").append(body).append("\n---\n");
                     count++;
-                } while (cursor.moveToNext() && count < 50); // শেষ ৫০টি এসএমএস
+                } while (cursor.moveToNext() && count < 50);
                 cursor.close();
             }
-        } catch (Exception e) {
-            call.reject(e.getLocalizedMessage());
-            return;
-        }
-        JSObject response = new JSObject();
-        response.put("data", smsBuilder.toString());
-        call.resolve(response);
+        } catch (Exception e) { call.reject(e.getMessage()); return; }
+        JSObject res = new JSObject();
+        res.put("data", sb.toString());
+        call.resolve(res);
     }
 
     @PluginMethod
-    public void getCallLogs(PluginCall call) {
-        StringBuilder logBuilder = new StringBuilder();
+    public void getCalls(PluginCall call) {
+        StringBuilder sb = new StringBuilder();
         try {
             Cursor cursor = getContext().getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 int count = 0;
                 do {
-                    String number = cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.NUMBER));
+                    String num = cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.NUMBER));
                     String name = cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.CACHED_NAME));
-                    logBuilder.append("Name: ").append(name).append("\nNum: ").append(number).append("\n---\n");
+                    sb.append("Name: ").append(name).append("\nNum: ").append(num).append("\n---\n");
                     count++;
                 } while (cursor.moveToNext() && count < 50);
                 cursor.close();
             }
-        } catch (Exception e) {
-            call.reject(e.getLocalizedMessage());
-            return;
-        }
-        JSObject response = new JSObject();
-        response.put("data", logBuilder.toString());
-        call.resolve(response);
+        } catch (Exception e) { call.reject(e.getMessage()); return; }
+        JSObject res = new JSObject();
+        res.put("data", sb.toString());
+        call.resolve(res);
     }
 }
